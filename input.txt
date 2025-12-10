@@ -1,0 +1,41 @@
+Deep learning has transformed the field of artificial intelligence. 
+Instead of manually designing features for every task, researchers now build flexible neural networks that can learn useful representations directly from data. 
+Among these architectures, the transformer has become particularly influential. 
+By relying on self-attention rather than recurrence or convolution, transformers can model long-range dependencies and scale effectively to very large datasets.
+
+Large language models are a natural application of transformers. 
+In a language modeling setup, the model is trained to predict the next token in a sequence given all the previous tokens. 
+This simple objective turns out to be surprisingly powerful. 
+When trained on enough text, a transformer-based model begins to pick up grammar, factual knowledge, and even subtle stylistic patterns. 
+Scaling the number of parameters, the dataset size, and the amount of compute often leads to emergent capabilities that were not present in smaller models.
+
+However, training very large models is expensive and logistically challenging. 
+Most researchers and students cannot access clusters of dozens of high-end GPUs for weeks at a time. 
+For this reason, it is common to start with much smaller "toy" models that capture the core ideas of modern architectures. 
+Even a mini GPT-style model can provide insight into optimization dynamics, overfitting, generalization, and the qualitative behavior of generated text.
+
+In this small project, we train a compact transformer from scratch using a Byte Pair Encoding tokenizer. 
+The tokenizer learns a vocabulary of subword units, which helps the model represent words, prefixes, and suffixes efficiently. 
+Rather than treating every character as a separate symbol, we allow the tokenizer to merge frequent patterns into single tokens. 
+This strikes a balance between the flexibility of character-level models and the efficiency of word-level representations.
+
+Our training data is intentionally modest in size. 
+The goal is not to compete with state-of-the-art systems, but to build an end-to-end pipeline that is easy to run on a laptop CPU. 
+Despite the small scale, the same ingredients appear here as in much larger systems: tokenization, batching, autoregressive training, and sampling-based text generation. 
+By examining training loss curves, sample outputs, and overfitting behavior, we can build intuition that transfers to real-world language modeling projects.
+
+Once the model is trained, we can use it to generate new text by repeatedly sampling the next token from the model's probability distribution. 
+Sometimes the output will closely imitate phrases from the training data, which is a sign of memorization. 
+At other times, the model will recombine familiar fragments into novel sentences. 
+Because the model has no genuine understanding of the world, it will occasionally produce confident but incorrect statements. 
+This phenomenon, often referred to as hallucination, is not a bug in a narrow sense, but a natural consequence of predicting tokens based on statistical patterns.
+
+Mini experiments with such a model are very instructive. 
+We can vary the depth of the network, the embedding dimension, or the context length, and observe how the training and validation losses respond. 
+We can intentionally restrict the dataset to provoke overfitting and then add regularization or more data to see how the behavior changes. 
+Through these controlled experiments, we begin to see language modeling not as magic, but as a concrete optimization problem with understandable trade-offs.
+
+In summary, training a small GPT-style transformer with a custom tokenizer is an excellent way to demystify modern language models. 
+It reveals how much can be achieved with a simple objective and a relatively generic architecture. 
+At the same time, it highlights the limitations of small models and tiny datasets. 
+This contrast sets the stage for deeper study of scaling laws, alignment techniques, and the engineering challenges behind production-scale systems.
