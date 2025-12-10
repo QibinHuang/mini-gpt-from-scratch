@@ -1,11 +1,13 @@
 """
 mini_gpt_bpe.py
-使用 BPE tokenizer + Transformer 训练一个 mini GPT 语言模型
+Train a small GPT-style language model using:
+- A BPE tokenizer (trained separately)
+- A decoder-only Transformer architecture
 
-运行前请确保：
-1）当前目录下有 input.txt
-2）已经运行过 build_tokenizer.py 并生成 tokenizer.json
-3）已安装: pip install torch tokenizers
+Requirements:
+1) An input text file named input.txt in the same directory
+2) A tokenizer.json file generated via build_tokenizer.py
+3) Install dependencies: pip install torch tokenizers
 """
 
 import torch
@@ -15,36 +17,37 @@ from torch.optim import AdamW
 from tokenizers import Tokenizer
 
 # ======================
-# 0. 配置区域（可以根据机器性能调整）
+# 0. Configuration (adjust based on hardware)
 # ======================
-batch_size    = 8        # 每次训练的样本数
-block_size    = 16        # 序列长度（context length，单位：token）
-max_iters     = 500       # 训练步数：先来800步观察一下
-eval_interval = 100       # 每多少步评估/打印一次
-learning_rate = 3e-4      # 学习率
-eval_iters    = 20        # 每次评估用多少个batch估计loss
+batch_size    = 8        # Batch size
+block_size    = 16       # Context length (number of tokens)
+max_iters     = 500      # Number of training iterations
+eval_interval = 100      # Print losses every N steps
+learning_rate = 3e-4     # Learning rate
+eval_iters    = 20       # Number of batches for loss estimation
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-n_embd = 128              # embedding 维度
-n_head = 4                # 注意力头数
-n_layer = 3               # transformer block 层数
+# Model sizes
+n_embd = 128             # Embedding dimension
+n_head = 4               # Number of attention heads
+n_layer = 3              # Number of Transformer blocks
 dropout = 0.1
 
 print("Using device:", device)
 
 # ======================
-# 1. 加载文本 & tokenizer & 编码数据
+# 1. Load text, tokenizer, and encode dataset
 # ======================
 
-# 1.1 读取 input.txt
+# 1.1 Load raw input text
 with open("input.txt", "r", encoding="utf-8") as f:
     raw_text = f.read()
 
-# 1.2 加载 tokenizer.json
+# 1.2 Load tokenizer.json
 tokenizer = Tokenizer.from_file("tokenizer.json")
 
-# 获取特殊token id
+# Retrieve special token IDs
 bos_id = tokenizer.token_to_id("[BOS]")
 eos_id = tokenizer.token_to_id("[EOS]")
 pad_id = tokenizer.token_to_id("[PAD]")
@@ -54,58 +57,62 @@ print(f"Vocab size: {vocab_size}")
 
 def encode_text(text: str):
     """
-    使用 BPE tokenizer 将文本编码为 token id 列表。
-    注意：我们在训练 tokenizer 时已经设置了 post_processor，
-    会自动在序列前后加 [BOS] 和 [EOS]。
+    Encode text into token IDs using the BPE tokenizer.
+    Note: During tokenizer training we already enabled a post-processor,
+    so [BOS] and [EOS] are automatically appended.
     """
     return tokenizer.encode(text).ids
 
 def decode_tokens(ids):
-    # 解码时去掉 PAD
+    """
+    Decode a sequence of token IDs back into text.
+    PAD tokens are removed before decoding.
+    """
     cleaned = [i for i in ids if i != pad_id]
     return tokenizer.decode(cleaned)
 
-# 1.3 把整个文本编码成一个长的 token 序列
+# 1.3 Encode entire dataset into a single long token sequence
 data_ids = encode_text(raw_text)
 data = torch.tensor(data_ids, dtype=torch.long)
 
 print("Total tokens in dataset:", len(data))
 
-# 1.4 划分 train / val
+# 1.4 Split into train / val
 n = int(0.9 * len(data))
 train_data = data[:n]
 val_data = data[n:]
 
 def get_batch(split: str):
     """
-    从 train_data / val_data 中采样 batch。
-    x: (B, T) 输入token
-    y: (B, T) 目标token = x右移一位
+    Sample a batch of sequences from the dataset.
+
+    Returns:
+        x: (B, T) input tokens
+        y: (B, T) target tokens (shifted by one position)
     """
     data_source = train_data if split == "train" else val_data
 
-    # 保证足够长
+    # Ensure dataset is long enough
     if len(data_source) <= block_size + 1:
         raise ValueError(
             f"Data too short for block_size={block_size}. "
-            f"Please add more text to input.txt or reduce block_size."
+            f"Add more text to input.txt or reduce block_size."
         )
 
     ix = torch.randint(0, len(data_source) - block_size - 1, (batch_size,))
     x = torch.stack([data_source[i : i + block_size] for i in ix])
     y = torch.stack([data_source[i + 1 : i + 1 + block_size] for i in ix])
 
-    x = x.to(device)
-    y = y.to(device)
-    return x, y
+    return x.to(device), y.to(device)
 
 @torch.no_grad()
 def estimate_loss(model):
     """
-    在 train / val 上估计平均loss
+    Compute average train/val loss over eval_iters batches.
     """
     out = {}
     model.eval()
+
     for split in ["train", "val"]:
         losses = []
         for _ in range(eval_iters):
@@ -113,48 +120,56 @@ def estimate_loss(model):
             _, loss = model(xb, yb)
             losses.append(loss.item())
         out[split] = sum(losses) / len(losses)
+
     model.train()
     return out
 
 # ======================
-# 2. 模型定义：GPT 架构
+# 2. Model Architecture: Decoder-only GPT
 # ======================
 
 class CausalSelfAttention(nn.Module):
     """
-    因果自注意力（decoder-only，用下三角 mask 限制只能看过去）
+    Causal self-attention layer (decoder-only).
+    Uses a lower-triangular mask so each token can attend only to previous ones.
     """
     def __init__(self, n_embd, n_head, dropout):
         super().__init__()
         assert n_embd % n_head == 0
+
         self.n_head = n_head
         self.head_dim = n_embd // n_head
 
+        # Linear projections
         self.q_proj = nn.Linear(n_embd, n_embd)
         self.k_proj = nn.Linear(n_embd, n_embd)
         self.v_proj = nn.Linear(n_embd, n_embd)
-
         self.out_proj = nn.Linear(n_embd, n_embd)
+
         self.attn_dropout = nn.Dropout(dropout)
         self.resid_dropout = nn.Dropout(dropout)
 
-        # 下三角mask，用于因果约束
+        # Causal mask: lower triangular (T, T)
         mask = torch.tril(torch.ones(block_size, block_size)).view(1, 1, block_size, block_size)
         self.register_buffer("mask", mask)
 
     def forward(self, x):
         B, T, C = x.size()
 
+        # Project to Q, K, V
         q = self.q_proj(x)
         k = self.k_proj(x)
         v = self.v_proj(x)
 
+        # Reshape for multi-head attention
         q = q.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
         k = k.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
         v = v.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
 
+        # Scaled dot-product attention
         att = (q @ k.transpose(-2, -1)) / (self.head_dim ** 0.5)
 
+        # Apply causal mask
         att = att.masked_fill(self.mask[:, :, :T, :T] == 0, float("-inf"))
 
         att = F.softmax(att, dim=-1)
@@ -163,13 +178,12 @@ class CausalSelfAttention(nn.Module):
         y = att @ v
         y = y.transpose(1, 2).contiguous().view(B, T, C)
 
-        y = self.resid_dropout(self.out_proj(y))
-        return y
+        return self.resid_dropout(self.out_proj(y))
 
 
 class FeedForward(nn.Module):
     """
-    两层前馈网络
+    Two-layer feed-forward network with GELU activation.
     """
     def __init__(self, n_embd, dropout):
         super().__init__()
@@ -186,7 +200,8 @@ class FeedForward(nn.Module):
 
 class Block(nn.Module):
     """
-    Transformer block: 自注意力 + 前馈 + 残差 + LayerNorm（pre-norm）
+    Transformer block: LayerNorm → Self-Attention → LayerNorm → FeedForward,
+    each wrapped with residual connections (pre-norm architecture).
     """
     def __init__(self, n_embd, n_head, dropout):
         super().__init__()
@@ -203,35 +218,49 @@ class Block(nn.Module):
 
 class GPTLanguageModel(nn.Module):
     """
-    mini GPT 语言模型：输入token序列，预测下一个token
+    Mini GPT language model.
+    Takes token sequences as input and predicts the next token.
     """
     def __init__(self, vocab_size, n_embd, n_head, n_layer, dropout):
         super().__init__()
-        self.token_embed = nn.Embedding(vocab_size, n_embd)
-        self.pos_embed = nn.Embedding(block_size, n_embd)
 
+        # Token & positional embeddings
+        self.token_embed = nn.Embedding(vocab_size, n_embd)
+        self.pos_embed   = nn.Embedding(block_size, n_embd)
+
+        # Transformer blocks
         self.blocks = nn.ModuleList(
             [Block(n_embd, n_head, dropout) for _ in range(n_layer)]
         )
+
         self.ln_f = nn.LayerNorm(n_embd)
         self.lm_head = nn.Linear(n_embd, vocab_size)
 
         self.apply(self._init_weights)
 
     def _init_weights(self, module):
+        """
+        Initialize weights following GPT-style initialization.
+        """
         if isinstance(module, (nn.Linear, nn.Embedding)):
             nn.init.normal_(module.weight, mean=0.0, std=0.02)
         if isinstance(module, nn.Linear) and module.bias is not None:
             nn.init.zeros_(module.bias)
 
     def forward(self, idx, targets=None):
+        """
+        Forward pass.
+        idx: (B, T) token IDs
+        targets: (B, T) token IDs for supervised training
+        """
         B, T = idx.shape
 
+        # Token + positional embeddings
         tok_emb = self.token_embed(idx)
-        pos = torch.arange(0, T, device=idx.device)
-        pos_emb = self.pos_embed(pos)[None, :, :]
+        pos_emb = self.pos_embed(torch.arange(T, device=idx.device))[None, :, :]
         x = tok_emb + pos_emb
 
+        # Pass through Transformer blocks
         for block in self.blocks:
             x = block(x)
 
@@ -240,8 +269,7 @@ class GPTLanguageModel(nn.Module):
 
         loss = None
         if targets is not None:
-            B, T, C = logits.shape
-            logits_flat = logits.view(B * T, C)
+            logits_flat = logits.view(B * T, vocab_size)
             targets_flat = targets.view(B * T)
             loss = F.cross_entropy(logits_flat, targets_flat)
 
@@ -250,8 +278,7 @@ class GPTLanguageModel(nn.Module):
     @torch.no_grad()
     def generate(self, idx, max_new_tokens):
         """
-        自回归生成新token：
-        idx: (1, T) 初始token序列
+        Autoregressively generate new tokens starting from idx.
         """
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -block_size:]
@@ -262,8 +289,9 @@ class GPTLanguageModel(nn.Module):
             idx = torch.cat([idx, next_id], dim=1)
         return idx
 
+
 # ======================
-# 3. 训练循环
+# 3. Training loop
 # ======================
 
 def main():
@@ -282,26 +310,23 @@ def main():
                 f"val loss {losses['val']:.4f}"
             )
 
-            # 生成样例
-            # 以一个 [BOS] 作为起点
+            # Generate a sample sequence using [BOS] as the seed
             context = torch.tensor([[bos_id]], dtype=torch.long, device=device)
             generated = model.generate(context, max_new_tokens=50)
             gen_ids = generated[0].tolist()
-            txt = decode_tokens(gen_ids)
             print("=== Sample ===")
-            print(txt)
+            print(decode_tokens(gen_ids))
             print("==============")
 
         xb, yb = get_batch("train")
         _, loss = model(xb, yb)
-
         train_losses_log.append(loss.item())
 
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()
 
-    # 保存模型和训练loss轨迹
+    # Save model checkpoint
     torch.save(
         {
             "model_state_dict": model.state_dict(),
@@ -316,7 +341,7 @@ def main():
         },
         "mini_gpt_bpe.pt",
     )
-    print("模型已保存为 mini_gpt_bpe.pt")
+    print("Model saved as mini_gpt_bpe.pt")
 
 if __name__ == "__main__":
     main()
