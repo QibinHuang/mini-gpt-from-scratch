@@ -6,6 +6,14 @@ A laptop-scale experiment in next-token prediction. This repository implements c
 Transformer blocks and autoregressive generation in PyTorch, and trains a byte-level BPE tokenizer
 using Hugging Face Tokenizers. The released 32-token model comes with matching weights and tokenizer.
 
+## The Understudy · Interactive language lab
+
+[Launch in Google Colab](https://colab.research.google.com/github/QibinHuang/mini-gpt-from-scratch/blob/main/lab/launch.ipynb) and run the cell, or run `python -m lab.server` locally after installing the project dependencies and open `http://127.0.0.1:8765/`.
+
+Guess the missing token on ten actual MiniGPT mistakes, edit the text and compare live PyTorch predictions with the interpolated trigram. In “Of any thing the image”, replacing “any” with “every” raises MiniGPT’s probability for “ of” from 46.95% to 49.39%. The final two BPE IDs stay fixed and the trigram assigns 17.89% both times. Save your own observations in the browser or export them as Markdown.
+
+The curated cards use the first eligible readable target per line, then rank wrong predictions with readable top guesses within each genre. Their accuracy is deliberately unrepresentative. The compressed training IDs reconstruct the statistical baseline offline. After preparing the evaluation data, rebuild both assets with `python -m experiments.build_lab`.
+
 ## Play The Missing Word
 
 [Guess Shakespeare’s next token in six rounds](play/README.md). Pick a continuation, reveal the original line, and compare the probabilities assigned by MiniGPT and an interpolated trigram. Each round uses stored predictions from the released checkpoint. For a scored terminal game, run `python3 play/quiz.py`.
