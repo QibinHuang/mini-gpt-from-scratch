@@ -1,44 +1,50 @@
-"""
-plot_loss_bpe.py
-Load a saved training checkpoint (mini_gpt_bpe.pt)
-and visualize the training loss curve.
+"""Plot the training loss stored in a Mini GPT checkpoint."""
 
-This script is used to inspect model convergence behavior.
-"""
+import argparse
+from pathlib import Path
 
+import matplotlib
 import torch
-import matplotlib.pyplot as plt
 
-# ---------------------------------------
-# 1. Load the trained checkpoint
-# ---------------------------------------
-ckpt_path = "mini_gpt_bpe.pt"
-ckpt = torch.load(ckpt_path, map_location="cpu")
 
-# Ensure the checkpoint contains the training loss log
-if "train_losses_log" not in ckpt:
-    raise KeyError(
-        "train_losses_log not found in checkpoint. "
-        "Make sure you trained with the latest mini_gpt_bpe.py."
-    )
+def main():
+    parser = argparse.ArgumentParser(description="Plot Mini GPT training loss.")
+    parser.add_argument("--checkpoint", type=Path, default=Path("mini_gpt_bpe.pt"))
+    parser.add_argument("--output", type=Path, help="Save the figure instead of displaying it.")
+    args = parser.parse_args()
+    if args.output:
+        matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
 
-train_losses = ckpt["train_losses_log"]
-print(f"Loaded {len(train_losses)} training steps.")
+    checkpoint = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
+    train_losses = checkpoint["train_losses_log"]
+    print(f"Loaded {len(train_losses)} training steps.")
 
-# ---------------------------------------
-# 2. Build the x-axis (training steps)
-# ---------------------------------------
-steps = list(range(len(train_losses)))
+    fig, ax = plt.subplots(figsize=(8, 4))
+    evaluations = checkpoint.get("evaluation_log")
+    if evaluations:
+        ax.plot(
+            range(1, len(train_losses) + 1), train_losses,
+            linewidth=0.8, alpha=0.25, label="Training batches",
+        )
+        steps = [entry["step"] for entry in evaluations]
+        ax.plot(steps, [entry["train"] for entry in evaluations], label="Train")
+        ax.plot(steps, [entry["val"] for entry in evaluations], label="Validation")
+        ax.legend()
+    else:
+        ax.plot(range(1, len(train_losses) + 1), train_losses, linewidth=1.5)
+    ax.set(xlabel="Training Step", ylabel="Cross-Entropy Loss", title="Mini GPT (BPE) — Loss by Step")
+    ax.grid(True)
+    fig.tight_layout()
 
-# ---------------------------------------
-# 3. Plot the training loss curve
-# ---------------------------------------
-plt.figure(figsize=(8, 4))
-plt.plot(steps, train_losses, linewidth=1.5)
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(args.output, dpi=150)
+        print(f"Plot saved to {args.output}")
+    else:
+        plt.show()
+    plt.close(fig)
 
-plt.xlabel("Training Step")
-plt.ylabel("Training Loss")
-plt.title("Mini GPT (BPE) — Training Loss Curve")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+
+if __name__ == "__main__":
+    main()

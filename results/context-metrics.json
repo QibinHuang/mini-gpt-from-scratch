@@ -1,0 +1,44 @@
+{
+  "checkpoint_step": 1600,
+  "test_predictions": 19724,
+  "context_length": 64,
+  "scores": {
+    "unigram": {
+      "cross_entropy": 5.893562796373613,
+      "perplexity": 362.69519428757866
+    },
+    "bigram": {
+      "cross_entropy": 4.567822720827523,
+      "perplexity": 96.33413496325028
+    },
+    "mini_gpt": {
+      "cross_entropy": 4.238283255694483,
+      "perplexity": 69.28879852564114
+    }
+  },
+  "context_sweep": {
+    "shared_targets": 2048,
+    "scores_by_context_length": {
+      "1": {
+        "cross_entropy": 4.586601193994284,
+        "perplexity": 98.16023495523537
+      },
+      "4": {
+        "cross_entropy": 4.292857896536589,
+        "perplexity": 73.17529738077769
+      },
+      "16": {
+        "cross_entropy": 4.237141273915768,
+        "perplexity": 69.20971714359872
+      },
+      "32": {
+        "cross_entropy": 4.2265778966248035,
+        "perplexity": 68.48247660969214
+      },
+      "64": {
+        "cross_entropy": 4.25905891880393,
+        "perplexity": 70.7433768563779
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "groups": [
+    {
+      "context": 32,
+      "runs": [
+        {
+          "seed": 42,
+          "step": 1600,
+          "validation_loss": 3.9968819843189056,
+          "seconds": 35.26490316702984,
+          "tokens_per_second": 23229.895063653352
+        },
+        {
+          "seed": 43,
+          "step": 1600,
+          "validation_loss": 4.018326151685474,
+          "seconds": 46.25537562498357,
+          "tokens_per_second": 17710.373960459885
+        },
+        {
+          "seed": 44,
+          "step": 1600,
+          "validation_loss": 3.9977778675890216,
+          "seconds": 82.33764995803358,
+          "tokens_per_second": 9949.275943842647
+        }
+      ],
+      "mean_loss": 4.004328667864467,
+      "sd_loss": 0.012130449979202396
+    },
+    {
+      "context": 64,
+      "runs": [
+        {
+          "seed": 42,
+          "step": 1600,
+          "validation_loss": 4.074310845422965,
+          "seconds": 35.14888016600162,
+          "tokens_per_second": 23306.574665567463
+        },
+        {
+          "seed": 43,
+          "step": 1600,
+          "validation_loss": 4.049901292802086,
+          "seconds": 76.98946795897791,
+          "tokens_per_second": 10640.41643249817
+        },
+        {
+          "seed": 44,
+          "step": 1600,
+          "validation_loss": 4.055629178573855,
+          "seconds": 66.36087091604713,
+          "tokens_per_second": 12344.624003448758
+        }
+      ],
+      "mean_loss": 4.059947105599635,
+      "sd_loss": 0.012764792796510277
+    }
+  ],
+  "selected_context": 32,
+  "release_seed": 42,
+  "validation_targets": 20963
+}

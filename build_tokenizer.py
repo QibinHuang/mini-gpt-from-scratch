@@ -6,10 +6,16 @@ and save it as tokenizer.json.
 This tokenizer will be used by the mini GPT model.
 """
 
-from tokenizers import Tokenizer, models, trainers, pre_tokenizers, processors
+import argparse
+from pathlib import Path
+
+from tokenizers import Tokenizer, decoders, models, pre_tokenizers, processors, trainers
 
 def main():
-    input_file = "input.txt"
+    parser = argparse.ArgumentParser(description="Train a byte-level BPE tokenizer.")
+    parser.add_argument("--input", type=Path, default=Path("input.txt"))
+    parser.add_argument("--output", type=Path, default=Path("tokenizer.json"))
+    args = parser.parse_args()
 
     # ---------------------------------------
     # 1. Initialize an empty BPE tokenizer
@@ -18,6 +24,7 @@ def main():
 
     # Use ByteLevel pre-tokenization (commonly used for English text)
     tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel()
+    tokenizer.decoder = decoders.ByteLevel()
 
     # ---------------------------------------
     # 2. Configure the BPE trainer
@@ -28,13 +35,14 @@ def main():
     trainer = trainers.BpeTrainer(
         vocab_size=vocab_size,
         special_tokens=special_tokens,
+        initial_alphabet=pre_tokenizers.ByteLevel.alphabet(),
         show_progress=True,
     )
 
     # ---------------------------------------
     # 3. Train the tokenizer on input.txt
     # ---------------------------------------
-    tokenizer.train(files=[input_file], trainer=trainer)
+    tokenizer.train(files=[str(args.input)], trainer=trainer)
 
     # ---------------------------------------
     # 4. Add BOS/EOS template post-processing
@@ -56,9 +64,10 @@ def main():
     # ---------------------------------------
     # 5. Save the tokenizer to file
     # ---------------------------------------
-    tokenizer.save("tokenizer.json")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    tokenizer.save(str(args.output))
 
-    print("Tokenizer saved to tokenizer.json")
+    print(f"Tokenizer saved to {args.output}")
     print("Vocab size:", tokenizer.get_vocab_size())
 
 
