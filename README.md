@@ -1,5 +1,7 @@
 # Mini GPT from scratch
 
+[![Model checks](https://github.com/QibinHuang/mini-gpt-from-scratch/actions/workflows/model-checks.yml/badge.svg?branch=main)](https://github.com/QibinHuang/mini-gpt-from-scratch/actions/workflows/model-checks.yml)
+
 A laptop-scale experiment in next-token prediction. This repository implements causal attention,
 Transformer blocks and autoregressive generation in PyTorch, and trains a byte-level BPE tokenizer
 using Hugging Face Tokenizers. The released 32-token model comes with matching weights and tokenizer.

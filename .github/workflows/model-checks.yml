@@ -1,0 +1,40 @@
+name: Model checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      OMP_NUM_THREADS: "2"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install CPU dependencies
+        run: |
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu 'torch==2.5.1'
+          python -m pip install -r requirements.txt
+      - name: Check model behavior
+        run: python -m unittest discover -s tests -v
+      - name: Generate with the released weights
+        run: |
+          python generate_bpe.py --checkpoint demo/model.pt --tokenizer demo/tokenizer.json \
+            --prompt "ROMEO:" --temperature 0 --tokens 16
+      - name: Train and reload a fresh checkpoint
+        run: |
+          python build_tokenizer.py --output "$RUNNER_TEMP/tokenizer.json"
+          python mini_gpt_bpe.py --steps 2 --eval-interval 2 \
+            --tokenizer "$RUNNER_TEMP/tokenizer.json" --output "$RUNNER_TEMP/model.pt"
+          python generate_bpe.py --checkpoint "$RUNNER_TEMP/model.pt" \
+            --tokenizer "$RUNNER_TEMP/tokenizer.json" --prompt "Language models" --tokens 8
