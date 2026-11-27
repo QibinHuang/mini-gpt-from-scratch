@@ -1,0 +1,146 @@
+[
+  {
+    "genre": "戏剧",
+    "prompt": "ate, let's stand aside and see the end of\nthis controversy.\n\nTRANIO:\nSir,",
+    "answer": 3,
+    "options": [
+      "my",
+      "I",
+      "you",
+      "what"
+    ],
+    "gpt": [
+      0.06565588712692261,
+      0.08860666304826736,
+      0.06044887751340866,
+      0.014237548224627972
+    ],
+    "trigram": [
+      0.048927510557376507,
+      0.13245547715999437,
+      0.023582393825819,
+      0.002629792596045838
+    ],
+    "continuation": " what are you that offer to beat my servant?"
+  },
+  {
+    "genre": "戏剧",
+    "prompt": ", where is my son Lucentio?\n\nTRANIO:\nCall forth an officer.\nCarry",
+    "answer": 2,
+    "options": [
+      "to",
+      "that",
+      "this",
+      "the"
+    ],
+    "gpt": [
+      0.008815630339086056,
+      0.010611984878778458,
+      0.006441188510507345,
+      0.02540925331413746
+    ],
+    "trigram": [
+      0.0028469577073669456,
+      0.002476590941596,
+      0.001643029669471414,
+      0.0008939381099819451
+    ],
+    "continuation": " this mad knave to the gaol. Father"
+  },
+  {
+    "genre": "戏剧",
+    "prompt": "ATHARINA:\nNo, sir, God forbid; but ashamed to kiss.\n\nPETRUCHIO:\nWhy,",
+    "answer": 3,
+    "options": [
+      "I",
+      "my",
+      "sir",
+      "then"
+    ],
+    "gpt": [
+      0.08921767771244049,
+      0.057366594672203064,
+      0.06104988604784012,
+      0.011079403571784496
+    ],
+    "trigram": [
+      0.03045240585797586,
+      0.017197000311824924,
+      0.020087323610929943,
+      0.12976454653870756
+    ],
+    "continuation": " then let's home again. Come, sirrah,"
+  },
+  {
+    "genre": "十四行诗",
+    "prompt": "irest creatures we desire increase,\nThat thereby beauty's rose might never die,\nBut as the riper",
+    "answer": 2,
+    "options": [
+      "to",
+      "with",
+      "should",
+      "than"
+    ],
+    "gpt": [
+      0.010822913609445095,
+      0.009739517234265804,
+      0.00043054227717220783,
+      0.008686559274792671
+    ],
+    "trigram": [
+      0.012550170130011322,
+      0.005885407479849227,
+      0.0002458781069531515,
+      0.004993583895602841
+    ],
+    "continuation": " should by time decease,\nHis tender heir"
+  },
+  {
+    "genre": "十四行诗",
+    "prompt": "mother.\nFor where is she so fair whose unear'd womb\nDisdains the tillage of thy husbandry?\nOr",
+    "answer": 3,
+    "options": [
+      "I",
+      "my",
+      "thou",
+      "who"
+    ],
+    "gpt": [
+      0.014240672811865807,
+      0.012577375397086143,
+      0.012041585519909859,
+      0.0007025318336673081
+    ],
+    "trigram": [
+      0.03491808827890469,
+      0.013276661010801428,
+      0.00876525626965833,
+      2.6257412748621373e-05
+    ],
+    "continuation": " who is he so fond will be the tomb,"
+  },
+  {
+    "genre": "十四行诗",
+    "prompt": "going in thy noon:\nUnlook'd, on diest unless thou get a son.\nMusic to hear,",
+    "answer": 3,
+    "options": [
+      "I",
+      "my",
+      "sir",
+      "why"
+    ],
+    "gpt": [
+      0.07018175721168518,
+      0.04759843647480011,
+      0.05652181804180145,
+      0.0026154646184295416
+    ],
+    "trigram": [
+      0.05211908563285038,
+      0.011210459122559845,
+      0.008103208218186306,
+      0.0005614585613009862
+    ],
+    "continuation": " why hear'st thou music sadly?\nS"
+  }
+]

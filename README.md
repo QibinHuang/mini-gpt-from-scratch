@@ -6,6 +6,10 @@ A laptop-scale experiment in next-token prediction. This repository implements c
 Transformer blocks and autoregressive generation in PyTorch, and trains a byte-level BPE tokenizer
 using Hugging Face Tokenizers. The released 32-token model comes with matching weights and tokenizer.
 
+## Play The Missing Word
+
+[Guess Shakespeare’s next token in six rounds](play/README.md). Pick a continuation, reveal the original line, and compare the probabilities assigned by MiniGPT and an interpolated trigram. Each round uses stored predictions from the released checkpoint. For a scored terminal game, run `python3 play/quiz.py`.
+
 ## Run the released model
 
 From a clean checkout with Python 3.11:
@@ -66,3 +70,7 @@ The small corpus and next-token objective yield recognizable dialogue structure 
 and invented words. [Released model sample](results/sample.txt)
 
 [Reproduce training, selection and evaluations](docs/reproduce.md) · [Three-minute demo](docs/demo.md) · [Verified package versions](results/environment-macos-arm64.txt)
+
+## A stronger statistical baseline
+
+With Witten–Bell interpolation, a trigram trained on the same BPE IDs scored 73.48 perplexity on the play test split versus 65.97 for the released 32-token MiniGPT. On the sonnets, the trigram scored 90.55 versus 91.48 for MiniGPT. This follow-up revisits the existing test splits. Run `OMP_NUM_THREADS=4 python -m experiments.compare_trigram` after preparing the corpora. [All scores](results/trigram-review.json)

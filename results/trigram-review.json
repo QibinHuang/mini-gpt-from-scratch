@@ -1,0 +1,44 @@
+{
+  "plays": {
+    "targets": 19724,
+    "scores": {
+      "unigram": {
+        "cross_entropy": 5.893562796373613,
+        "perplexity": 362.69519428757866
+      },
+      "bigram": {
+        "cross_entropy": 4.567822720827523,
+        "perplexity": 96.33413496325028
+      },
+      "interpolated_trigram": {
+        "cross_entropy": 4.297038753667496,
+        "perplexity": 73.48187327307345
+      },
+      "mini_gpt": {
+        "cross_entropy": 4.189147260459338,
+        "perplexity": 65.9665147138736
+      }
+    }
+  },
+  "sonnets": {
+    "targets": 33646,
+    "scores": {
+      "unigram": {
+        "cross_entropy": 6.133206780739663,
+        "perplexity": 460.9118365309703
+      },
+      "bigram": {
+        "cross_entropy": 4.754819741166587,
+        "perplexity": 116.14271552694849
+      },
+      "interpolated_trigram": {
+        "cross_entropy": 4.505937067527144,
+        "perplexity": 90.55315872864666
+      },
+      "mini_gpt": {
+        "cross_entropy": 4.516134040006905,
+        "perplexity": 91.48125061811919
+      }
+    }
+  }
+}
