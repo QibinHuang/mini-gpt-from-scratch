@@ -6,6 +6,10 @@ A laptop-scale experiment in next-token prediction. This repository implements c
 Transformer blocks and autoregressive generation in PyTorch, and trains a byte-level BPE tokenizer
 using Hugging Face Tokenizers. The released 32-token model comes with matching weights and tokenizer.
 
+## Why did the trigram win on poetry?
+
+Across the sonnets, MiniGPT gained on complete words while the trigram recovered more loss on word fragments and other residual tokens. A validation-selected probability mixture scored **70.56 perplexity** on a separate narrative poem, versus **95.79** for the stronger individual model. [Token attribution, three-seed interventions and held-out mixture study](docs/model-diagnosis.md)
+
 ## The Understudy · Interactive language lab
 
 [Launch in Google Colab](https://colab.research.google.com/github/QibinHuang/mini-gpt-from-scratch/blob/main/lab/launch.ipynb) and run the cell, or run `python -m lab.server` locally after installing the project dependencies and open `http://127.0.0.1:8765/`.

@@ -1,0 +1,133 @@
+{
+  "attribution": {
+    "plays": {
+      "targets": 19724,
+      "mean_delta": -0.10789158254684961,
+      "groups": {
+        "newline": {
+          "count": 2000,
+          "fraction": 0.1013993104846887,
+          "mean_delta": 0.0405057558437401,
+          "contribution": 0.004107255713216396
+        },
+        "speaker_header": {
+          "count": 2129,
+          "fraction": 0.10793956601095113,
+          "mean_delta": -1.8743375049348823,
+          "contribution": -0.20231517684072017
+        },
+        "punctuation": {
+          "count": 2317,
+          "fraction": 0.11747110119651187,
+          "mean_delta": -0.2313704958093937,
+          "contribution": -0.02717934692711241
+        },
+        "fragment_or_other": {
+          "count": 8178,
+          "fraction": 0.4146217805718921,
+          "mean_delta": 0.5243255872009264,
+          "contribution": 0.21739680856465096
+        },
+        "whole_word": {
+          "count": 5090,
+          "fraction": 0.25806124518353274,
+          "mean_delta": -0.385772174029664,
+          "contribution": -0.09955284758725359
+        },
+        "whitespace": {
+          "count": 10,
+          "fraction": 0.0005069965524234435,
+          "mean_delta": -0.6869385362997826,
+          "contribution": -0.00034827546963079627
+        }
+      },
+      "examples": [
+        {
+          "prefix": "\nFERD",
+          "target": "INA",
+          "gpt": 9.755495739227626e-06,
+          "trigram": 6.915461616744565e-10
+        },
+        {
+          "prefix": "That will I.\nGo, Biond",
+          "target": "ell",
+          "gpt": 1.6986530681606382e-05,
+          "trigram": 0.8018952638277806
+        }
+      ]
+    },
+    "sonnets": {
+      "targets": 33646,
+      "mean_delta": 0.01019690470179981,
+      "groups": {
+        "fragment_or_other": {
+          "count": 17334,
+          "fraction": 0.5151875408666706,
+          "mean_delta": 0.4381880103535532,
+          "contribution": 0.22574900349130628
+        },
+        "whole_word": {
+          "count": 11034,
+          "fraction": 0.32794388634607385,
+          "mean_delta": -0.5309346232528624,
+          "contribution": -0.17411676374523224
+        },
+        "punctuation": {
+          "count": 3063,
+          "fraction": 0.09103608155501397,
+          "mean_delta": -0.32621781663011723,
+          "contribution": -0.029697591759437945
+        },
+        "newline": {
+          "count": 2155,
+          "fraction": 0.06404921833204541,
+          "mean_delta": -0.15726624260636635,
+          "contribution": -0.010072779908955581
+        },
+        "whitespace": {
+          "count": 60,
+          "fraction": 0.00178327290019616,
+          "mean_delta": -0.9336559624147012,
+          "contribution": -0.0016649633758807011
+        }
+      },
+      "examples": [
+        {
+          "prefix": "'d;\nBut thence I learn and find the lesson true,\nD",
+          "target": "ru",
+          "gpt": 0.006097387056797743,
+          "trigram": 1.3326121167539752e-06
+        },
+        {
+          "prefix": " shadow I with these did play.\nThe forward vio",
+          "target": "let",
+          "gpt": 1.8017277398030274e-05,
+          "trigram": 0.7548123515999566
+        }
+      ]
+    }
+  },
+  "validation": {
+    "fixed_weight": 0.4,
+    "bucket_weights": [
+      0.5,
+      0.4,
+      0.45
+    ],
+    "selected": "frequency",
+    "fixed_loss": 3.5582358117015467,
+    "frequency_loss": 3.556700444717396
+  },
+  "final": {
+    "source_sha256": "63f8be0f401b80f6d4cd43998285fbdef062614cb1ebeee1b623c1f922e65e05",
+    "targets": 19789,
+    "lines": 1194,
+    "exact_training_line_matches": 0,
+    "perplexity": {
+      "gpt": 100.35783042011332,
+      "trigram": 95.79094953341485,
+      "fixed": 70.92824587539957,
+      "frequency": 70.55740499191593
+    }
+  }
+}
